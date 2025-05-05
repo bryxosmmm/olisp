@@ -1,0 +1,8 @@
+(library
+ (name ast)
+ (modules ast))
+
+(library
+ (name asm)
+ (modules asm)
+ (libraries ast))

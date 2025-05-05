@@ -1,0 +1,7 @@
+(executable
+ (public_name parser)
+ (name main)
+ (libraries ast asm))
+
+(ocamllex lexer)
+(menhir (modules parser))

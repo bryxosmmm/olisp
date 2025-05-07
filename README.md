@@ -12,6 +12,11 @@ In future maybe it became normal language.
 ```
 
 ```lisp
-(putchar 'a')
+(putchar 69)
 ```
+
+## Notes 
+So far it can do basic stuff with libc, can use binexpr for libc args.
+Now i want implement if statement;
+
 

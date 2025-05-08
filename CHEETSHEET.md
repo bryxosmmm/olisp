@@ -1,6 +1,3 @@
-Awesome — I’ll create a detailed and stylish LLVM-in-OCaml cheat sheet, focusing on mimicking C language constructs (like if/else, loops, structs, functions, and some advanced topics) purely in IR generation, and format it all as a Markdown file for readability and sharing. I’ll get started and let you know when it's ready!
-
-
 # LLVM IR Codegen with OCaml
 
 **LLVM IR** is a typed, **Static Single Assignment (SSA)** IR: once you create a value, it never changes. LLVM code is built inside a **module** (`Llvm.llmodule`) using an **IRBuilder** (`Llvm.llbuilder`) to insert instructions at the current point. Typically you start with:

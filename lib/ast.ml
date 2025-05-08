@@ -19,7 +19,9 @@ type var =
 (* TODO: libcexpr *)
 
 type libcout = string * var list
+type boolean = BooleanLiteral of bool
 
 type out =
   | BinExpr of binout
   | LibcExpr of libcout
+  | IfExpr of (boolean * out)

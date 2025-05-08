@@ -96,10 +96,34 @@ let walk_libcexpr f (e, v) =
   f <* sprintf "call %s\n" e
 ;;
 
+let walk_boolean f = function
+  | BooleanLiteral true -> f <* "mov rax, 0\n"
+  | BooleanLiteral false -> f <* "mov rax, 1\n"
+;;
+
+let walk_ifexpr f (b, _) =
+  walk_boolean f b;
+  f <* "cmp rax, 0\n";
+  f <* "je then_stmt\n"
+;;
+
 let walk f = function
   | BinExpr e -> walk_binexpr f e
   | LibcExpr e -> walk_libcexpr f e
+  | IfExpr e -> walk_ifexpr f e
 ;;
+
+module ThenStmt : WRITEABLE with type t = boolean * out = struct
+  type t = boolean * out
+
+  let gen f (_, e) = walk f e
+  let static f = f <* "then_stmt:\n"
+
+  let write f o =
+    static f;
+    gen f o
+  ;;
+end
 
 let program f (o : out) =
   f <* "format ELF64\n";
@@ -107,6 +131,10 @@ let program f (o : out) =
   f <* "public main\n";
   (match o with
    | LibcExpr v -> Extrn.write f v
+   | IfExpr (_, v) ->
+     (match v with
+      | LibcExpr e -> Extrn.write f e
+      | _ -> ())
    | _ -> ());
   f <* "main:\n";
   walk f o;
@@ -114,5 +142,12 @@ let program f (o : out) =
   f <* "ret\n";
   match o with
   | LibcExpr v -> Data.write f v
+  | IfExpr (a, v) ->
+    (match v with
+     | LibcExpr e ->
+       ThenStmt.write f (a, v);
+       Data.write f e
+     | BinExpr _ -> ThenStmt.write f (a, v)
+     | _ -> ())
   | _ -> ()
 ;;

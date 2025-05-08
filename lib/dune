@@ -6,3 +6,8 @@
  (name asm)
  (modules asm)
  (libraries ast))
+
+(library
+ (name dragon)
+ (modules dragon)
+ (libraries ast llvm))

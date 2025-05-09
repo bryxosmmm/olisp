@@ -11,6 +11,9 @@ let fall (buf : Lexing.lexbuf) c =
 type binout =
   | Num of int
   | Add of binout * binout
+  | Minus of binout * binout
+  | Times of binout * binout
+  | Div of binout * binout
 
 type var =
   | String of string
@@ -24,4 +27,4 @@ type boolean = BooleanLiteral of bool
 type out =
   | BinExpr of binout
   | LibcExpr of libcout
-  | IfExpr of (boolean * out)
+  | IfExpr of (boolean * out * out)

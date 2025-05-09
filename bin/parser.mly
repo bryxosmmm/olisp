@@ -1,7 +1,8 @@
 %{
 open Ast
 %}
-%token EOF PLUS LPAREN RPAREN
+%token EOF LPAREN RPAREN
+%token PLUS MINUS TIMES DIV
 %token <int> INT
 %token <string> STRING
 %token <string> EXTRN
@@ -12,14 +13,22 @@ open Ast
 %%
 main:
 | EOF {BinExpr (Num 0)}
-| ifexpr EOF {IfExpr $1}
-| binexpr EOF {BinExpr $1}
-| libcexpr EOF {LibcExpr $1}
+| expr EOF { $1 }
+| error { failwith "Syntax error" }
+
+expr:
+| ifexpr {IfExpr $1}
+| binexpr {BinExpr $1}
+| libcexpr {LibcExpr $1}
+
 
 binexpr:
 | LPAREN RPAREN { Num 0 }
 | INT { Num $1 }
 | LPAREN PLUS binexpr binexpr RPAREN { Add($3, $4) }
+| LPAREN MINUS binexpr binexpr RPAREN { Minus($3, $4) }
+| LPAREN TIMES binexpr binexpr RPAREN { Times($3, $4) }
+| LPAREN DIV binexpr binexpr RPAREN { Div($3, $4) }
 
 libcexpr:
 | LPAREN EXTRN variadic RPAREN { ($2, $3) }
@@ -35,5 +44,4 @@ boolean:
 | FALSE { BooleanLiteral false }
 
 ifexpr:
-| LPAREN IF boolean libcexpr RPAREN { ($3, LibcExpr $4) }
-| LPAREN IF boolean binexpr RPAREN { ($3, BinExpr $4) }
+| LPAREN IF boolean expr expr RPAREN { ($3, $4, $5) }

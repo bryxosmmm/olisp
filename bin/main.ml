@@ -1,8 +1,11 @@
 open Parser
 open Lexer
 
-let parse s = Lexing.from_string s |> main lex
-let chan () = open_out "out/out.asm"
+let lexbuf s = Lexing.from_string s
+let parse buf = buf |> main lex
+let chan () = open_out "out/out.ll"
 
-(* let () = parse "(printf \"Result: %d\n\" (+ (+ 10 24) 35))" |> Asm.program (chan ()) *)
-let () = parse "(putchar 69)" |> Asm.program (chan ())
+let () =
+  let buf = lexbuf "(if false (putchar (+ 34 35)) (putchar 49))" in
+  parse buf |> Dragon.program (chan ())
+;;

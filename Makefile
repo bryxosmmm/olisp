@@ -1,2 +1,5 @@
 build:
-	fasm ./out/out.asm && gcc -no-pie -o ./out/bin/b ./out/out.o
+	dune exec parser && clang ./out/out.ll -o ./out/bin/b
+
+compile:
+	clang ./out/out.ll -o ./out/bin/b

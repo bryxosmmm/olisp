@@ -6,7 +6,7 @@ O'lisp is compiller for lisp language, written in ocaml.
 1) Libc functions, yes
 2) Binop, yes 
 3) Logicop/if/else, yes
-4) functions, no
+4) functions, yes
 5) macros, not yet
 
 ## Examples
@@ -18,7 +18,7 @@ O'lisp is compiller for lisp language, written in ocaml.
 (if (= 1 1) (printf "true") (printf "false"))
 ```
 ## TODO
-- [ ] Functions 
-- [ ] Variables
+- [ ] Functions (Kind of working, but i need type system)
+- [ ] Variables (Working like args of functions, but not like variables)
 - [ ] Macros
-
+- [ ] My context for evaluating

@@ -1,8 +1,13 @@
 (library
- (name ast)
- (modules ast))
+  (name ast)
+  (modules ast))
 
 (library
- (name dragon)
- (modules dragon)
- (libraries ast llvm))
+  (name symbols)
+  (modules symbols)
+  (libraries ast llvm))
+
+(library
+  (name dragon)
+  (modules dragon)
+  (libraries ast llvm symbols))

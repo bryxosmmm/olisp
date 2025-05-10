@@ -19,7 +19,9 @@ type expr =
   | Bool of bool
   | Int of int
   | String of string
+  | Symbol of string
   | If of expr * expr * expr
   | Binop of char * expr * expr
   | Logicop of string * expr * expr
   | Call of string * expr list
+  | Defun of string * string list * expr

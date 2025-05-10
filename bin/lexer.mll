@@ -9,16 +9,17 @@ let string = '"' [^'"']+ '"'
 let binop = ['+' '-' '*' '/']
 let logicop = "and" | "or" | "=" | "<" | ">" | "<=" | ">="
 rule lex = parse 
-| logicop as l { LOGICOP l }
 | "if" { IF }
+| "defun" { DEFUN }
 | "true" { TRUE }
 | "false" { FALSE }
 | binop as b { BINOP b }
+| logicop as l { LOGICOP l }
 | '(' { LPAREN }
 | ')' { RPAREN }
 | [' ' '\t' '\n'] { lex lexbuf }
 | digits as n { INT (int_of_string n) }
-| extrn as f { EXTRN f}
+| extrn as f { SYMBOL f}
 | string as s { STRING (String.sub s 1 (String.length s - 2)) }
 | eof  { EOF }
 | _ as p  { fall lexbuf p }

@@ -2,9 +2,12 @@
 
 O'lisp is compiller for lisp language, written in ocaml.
 
-## Goals
-Basicaly for now i want it to have the ability to use functions from libc.
-In future maybe it became normal language.
+## Can i do...
+1) Libc functions, yes
+2) Binop, yes 
+3) Logicop/if/else, yes
+4) functions, no
+5) macros, not yet
 
 ## Examples
 ```lisp
@@ -12,11 +15,10 @@ In future maybe it became normal language.
 ```
 
 ```lisp
-(putchar 69)
+(if (= 1 1) (printf "true") (printf "false"))
 ```
-
-## Notes 
-So far it can do basic stuff with libc, can use binexpr for libc args.
-Now i want implement if statement;
-
+## TODO
+- [ ] Functions 
+- [ ] Variables
+- [ ] Macros
 

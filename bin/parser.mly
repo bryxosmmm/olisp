@@ -6,7 +6,6 @@ open Ast
 %token <string> STRING
 %token <string> EXTRN
 %token <char> BINOP
-(*Boolean stuff*)
 %token IF TRUE FALSE
 %token <string> LOGICOP
 %start <expr> main

@@ -1,39 +1,45 @@
 %{
 open Ast
 %}
-%token EOF PLUS LPAREN RPAREN
+%token EOF LPAREN RPAREN
 %token <int> INT
 %token <string> STRING
 %token <string> EXTRN
+%token <char> BINOP
 (*Boolean stuff*)
-%token IF EQ TRUE FALSE
-%start <out> main
+%token IF TRUE FALSE
+%token <string> LOGICOP
+%start <expr> main
 
 %%
 main:
-| EOF {BinExpr (Num 0)}
-| ifexpr EOF {IfExpr $1}
-| binexpr EOF {BinExpr $1}
-| libcexpr EOF {LibcExpr $1}
+| EOF {Int 0 }
+| expr EOF { $1 }
+| error { failwith "Syntax error" }
+
+expr:
+| INT { Int $1 }
+| STRING { String $1 }
+| binexpr { $1 }
+| libcexpr { $1 }
+| ifexpr { $1 }
+| boolean { $1 }
 
 binexpr:
-| LPAREN RPAREN { Num 0 }
-| INT { Num $1 }
-| LPAREN PLUS binexpr binexpr RPAREN { Add($3, $4) }
+| LPAREN RPAREN { Int 0 }
+| LPAREN BINOP expr expr RPAREN { Binop($2, $3, $4) }
 
 libcexpr:
-| LPAREN EXTRN variadic RPAREN { ($2, $3) }
+| LPAREN EXTRN variadic RPAREN { Call($2, $3) }
 
 variadic:
 | { [] }
-| STRING variadic { String $1 :: $2 }
-| INT variadic { Int $1 :: $2 }
-| binexpr variadic { VarBinExpr $1 :: $2 }
+| expr variadic { $1 :: $2 }
 
 boolean:
-| TRUE { BooleanLiteral true }
-| FALSE { BooleanLiteral false }
+| TRUE { Bool true }
+| FALSE { Bool false }
+| LPAREN LOGICOP expr expr RPAREN { Logicop($2, $3, $4) }
 
 ifexpr:
-| LPAREN IF boolean libcexpr RPAREN { ($3, LibcExpr $4) }
-| LPAREN IF boolean binexpr RPAREN { ($3, BinExpr $4) }
+| LPAREN IF expr expr expr RPAREN { If($3, $4, $5) }

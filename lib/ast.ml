@@ -8,20 +8,18 @@ let fall (buf : Lexing.lexbuf) c =
   exit 1
 ;;
 
-type binout =
+type binop =
   | Num of int
-  | Add of binout * binout
+  | Add of binop * binop
+  | Minus of binop * binop
+  | Times of binop * binop
+  | Div of binop * binop
 
-type var =
-  | String of string
+type expr =
+  | Bool of bool
   | Int of int
-  | VarBinExpr of binout
-(* TODO: libcexpr *)
-
-type libcout = string * var list
-type boolean = BooleanLiteral of bool
-
-type out =
-  | BinExpr of binout
-  | LibcExpr of libcout
-  | IfExpr of (boolean * out)
+  | String of string
+  | If of expr * expr * expr
+  | Binop of char * expr * expr
+  | Logicop of string * expr * expr
+  | Call of string * expr list

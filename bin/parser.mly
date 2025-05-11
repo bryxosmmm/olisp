@@ -1,7 +1,7 @@
 %{
 open Ast
 %}
-%token EOF LPAREN RPAREN
+%token EOF LPAREN RPAREN ARROW SEMICOLON
 %token <int> INT
 %token <string> STRING
 %token <string> SYMBOL
@@ -9,6 +9,7 @@ open Ast
 %token IF TRUE FALSE
 %token <string> LOGICOP
 %token DEFUN
+%token <string> TYPE
 %start <expr list> main
 
 %%
@@ -30,6 +31,7 @@ expr:
 | ifexpr { $1 }
 | boolean { $1 }
 | defun { $1 }
+| typedef { $1 }
 
 binexpr:
 | LPAREN INT RPAREN { Int $2 }
@@ -58,3 +60,12 @@ funargs:
 | { [] }
 | SYMBOL funargs { $1 :: $2 }
 | LPAREN funargs RPAREN { $2 }
+
+
+typedef:
+| LPAREN SEMICOLON SYMBOL LPAREN types RPAREN RPAREN { Typedef($3, $5) }
+
+types:
+| { [] }
+| TYPE { [$1] }
+| TYPE ARROW types { $1 :: $3 }

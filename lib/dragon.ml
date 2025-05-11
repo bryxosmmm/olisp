@@ -5,6 +5,7 @@ open Symbols
 let ctx = create_context ()
 let the_mod = create_module ctx "main_mod"
 let i32_t = i32_type ctx
+let i8_t = i8_type ctx
 let bool_t = i1_type ctx
 let main_ty = function_type i32_t [||]
 let main_fn = declare_function "main" main_ty the_mod
@@ -38,6 +39,12 @@ let fn_of_string = function
   | _ -> failwith "[TODO:extrn] not processed extern function"
 ;;
 
+let lltype_of_string = function
+  | "Integer" -> i32_t
+  | "String" -> pointer_type2 ctx
+  | _ -> failwith "[TODO:typs] there is no such type yet"
+;;
+
 let get_fn s =
   let sym = get s symbols in
   match sym with
@@ -51,6 +58,13 @@ let get_var s =
   match sym with
   | Some (Variable v) -> v
   | _ -> failwith "[ERROR:var] incorrect symbol"
+;;
+
+let get_type s =
+  let sym = get s symbols in
+  match sym with
+  | Some (Typeof v) -> v
+  | _ -> failwith "[ERROR:type] incorrect symbol"
 ;;
 
 let rec build_binop = function
@@ -102,15 +116,22 @@ let build_call ({ entry; _ } as context) f name l =
   v
 ;;
 
-(* let a = param add_fn 0  *)
-(* let _ = set_value_name "a" a *)
-(* let b = param add_fn 1  *)
-(* let _ = set_value_name "b" b *)
-
 let build_fn f name args expr =
-  let arg_t = List.map (fun _ -> i32_t) args |> Array.of_list in
-  let ty, fn = nonvariadic_fn name i32_t arg_t the_mod () in
-  List.iteri (fun i a -> insert a (Variable (param fn i)) symbols) args;
+  let types = get_type name in
+  let ty, fn =
+    nonvariadic_fn
+      name
+      (List.hd types)
+      (types |> List.tl |> List.rev |> Array.of_list)
+      the_mod
+      ()
+  in
+  List.iteri
+    (fun i a ->
+       let p = param fn i in
+       insert a (Variable p) symbols;
+       set_value_name a p)
+    args;
   Symbols.insert name (Function (ty, fn)) symbols;
   let fn_bb = append_block ctx "entry" fn in
   let context = Symbols.return ty fn fn_bb in
@@ -141,14 +162,22 @@ let build_if ({ fn; _ } as context) f cond_expr if_expr else_expr =
   phi
 ;;
 
+let proc_typedef name types =
+  let lltypes = List.map lltype_of_string types |> List.rev in
+  insert name (Typeof lltypes) symbols
+;;
+
 let rec walk (context : Symbols.t) = function
   | (Int _ | Binop _) as v -> build_binop v
   | (Bool _ | Logicop _) as v -> build_logicop context walk v
-  | String v -> build_global_stringptr v "glbstr" bld
+  | String v -> build_global_stringptr (Scanf.unescaped v) "glbstr" bld
   | Symbol v -> get_var v
   | Call (n, l) -> build_call context walk n l
   | If (cond, ifb, elseb) -> build_if context walk cond ifb elseb
   | Defun (name, args, expr) -> build_fn walk name args expr
+  | Typedef (name, types) ->
+    proc_typedef name types;
+    const_int i32_t 0
 ;;
 
 (* | _ -> failwith "[ERROR] maybe i need to impl it..." *)

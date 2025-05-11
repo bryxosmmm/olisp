@@ -25,3 +25,4 @@ type expr =
   | Logicop of string * expr * expr
   | Call of string * expr list
   | Defun of string * string list * expr
+  | Typedef of string * string list

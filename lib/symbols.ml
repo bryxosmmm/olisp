@@ -3,6 +3,7 @@ open Llvm
 type record =
   | Function of lltype * llvalue
   | Variable of llvalue
+  | Typeof of lltype list
 
 type t =
   { fn : llvalue

@@ -9,11 +9,13 @@ let symbol = ['a'-'z' 'A'-'Z']+
 let string = '"' [^'"']+ '"'
 let binop = ['+' '-' '*' '/']
 let logicop = "and" | "or" | "=" | "<" | ">" | "<=" | ">="
-let type = "Integer" | "String"
+let type = "Integer" | "String" | "Bool"
 rule lex = parse 
 | "->" { ARROW }
 | "if" { IF }
 | "defun" { DEFUN }
+| "let" { LET }
+| "defparameter" { DEFPARAM }
 | "true" { TRUE }
 | "false" { FALSE }
 | type as t { TYPE t }

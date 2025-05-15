@@ -42,6 +42,7 @@ let fn_of_string = function
 let lltype_of_string = function
   | "Integer" -> i32_t
   | "String" -> pointer_type2 ctx
+  | "Bool" -> bool_t
   | _ -> failwith "[TODO:typs] there is no such type yet"
 ;;
 
@@ -167,6 +168,24 @@ let proc_typedef name types =
   insert name (Typeof lltypes) symbols
 ;;
 
+let build_defparam context f name e =
+  let expr_val = f context e in
+  insert name (Variable expr_val) symbols;
+  define_global name expr_val the_mod
+;;
+
+let build_variable context f name e =
+  let expr_val = f context e in
+  let expr_type = type_of expr_val in
+  let alloc_expr = build_alloca expr_type "allocval" bld in
+  let _ = build_store expr_val alloc_expr bld in
+  let load_expr = build_load2 expr_type alloc_expr name bld in
+  insert name (Variable load_expr) symbols;
+  load_expr
+;;
+
+let proc_block context f l = List.map (f context) l |> List.rev |> List.hd
+
 let rec walk (context : Symbols.t) = function
   | (Int _ | Binop _) as v -> build_binop v
   | (Bool _ | Logicop _) as v -> build_logicop context walk v
@@ -178,6 +197,9 @@ let rec walk (context : Symbols.t) = function
   | Typedef (name, types) ->
     proc_typedef name types;
     const_int i32_t 0
+  | Defparam (name, e) -> build_defparam context walk name e
+  | Block v -> proc_block context walk v
+  | Defvar (name, e) -> build_variable context walk name e
 ;;
 
 (* | _ -> failwith "[ERROR] maybe i need to impl it..." *)

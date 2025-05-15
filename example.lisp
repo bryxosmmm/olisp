@@ -1,8 +1,12 @@
 ; Example of type system
-(: greet (String -> Integer -> Integer)) 
-(defun greet (name age) (printf "Hello, %s. Im %d years old\n" name age)) 
 
-(: add (Integer -> Integer -> Integer)) 
-(defun add (a b) (+ a b))
+; (defparameter username "Sebastian")
+(defparameter default 0)
 
-(greet "Sebastian" (add 2 2))
+(: greet (Integer -> Integer)) 
+(defun greet (a) (+ a (greet (- a 1))))
+
+; (: add (Integer -> Integer -> Integer)) 
+; (defun add (a b) (- (+ a b) 100))
+
+(greet 5)

@@ -1,5 +1,9 @@
 open Llvm
 
+type scopes =
+  | Global
+  | Local of llbasicblock
+
 type record =
   | Function of lltype * llvalue
   | Variable of llvalue

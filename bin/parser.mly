@@ -8,7 +8,7 @@ open Ast
 %token <char> BINOP
 %token IF TRUE FALSE
 %token <string> LOGICOP
-%token DEFUN
+%token DEFUN DEFPARAM LET
 %token <string> TYPE
 %start <expr list> main
 
@@ -17,10 +17,6 @@ main:
 | EOF { [] }
 | expr_list EOF {$1}
 | error { failwith "Syntax error" }
-
-expr_list:
-| expr { [$1] }
-| expr expr_list { $1 :: $2 }
 
 expr:
 | INT { Int $1 }
@@ -32,6 +28,9 @@ expr:
 | boolean { $1 }
 | defun { $1 }
 | typedef { $1 }
+| defparam { $1 }
+| defvar { $1 }
+
 
 binexpr:
 | LPAREN INT RPAREN { Int $2 }
@@ -55,6 +54,7 @@ ifexpr:
 
 defun:
 | LPAREN DEFUN SYMBOL funargs expr RPAREN { Defun($3, $4, $5) }
+| LPAREN DEFUN SYMBOL funargs LPAREN expr_list RPAREN RPAREN { Defun($3, $4, Block $6) }
 
 funargs:
 | { [] }
@@ -69,3 +69,13 @@ types:
 | { [] }
 | TYPE { [$1] }
 | TYPE ARROW types { $1 :: $3 }
+
+defparam:
+| LPAREN DEFPARAM SYMBOL expr RPAREN { Defparam($3, $4) }
+
+defvar:
+| LPAREN LET SYMBOL expr RPAREN { Defvar($3, $4) }
+
+expr_list:
+| expr { [$1] }
+| expr expr_list { $1 :: $2 }

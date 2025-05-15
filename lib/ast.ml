@@ -26,3 +26,6 @@ type expr =
   | Call of string * expr list
   | Defun of string * string list * expr
   | Typedef of string * string list
+  | Defparam of string * expr
+  | Block of expr list
+  | Defvar of string * expr

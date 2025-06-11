@@ -68,27 +68,25 @@ let get_type s =
   | _ -> failwith "[ERROR:type] incorrect symbol"
 ;;
 
-let rec build_binop = function
-  | Symbol v -> get_var v
-  | Int v -> const_int i32_t v
+let rec build_binop f = function
   | Binop ('+', a, b) ->
-    let lhs = build_binop a in
-    let rhs = build_binop b in
+    let lhs = build_binop f a in
+    let rhs = build_binop f b in
     build_add lhs rhs "binopout" bld
   | Binop ('-', a, b) ->
-    let lhs = build_binop a in
-    let rhs = build_binop b in
+    let lhs = build_binop f a in
+    let rhs = build_binop f b in
     build_sub lhs rhs "binopout" bld
   | Binop ('*', a, b) ->
-    let lhs = build_binop a in
-    let rhs = build_binop b in
+    let lhs = build_binop f a in
+    let rhs = build_binop f b in
     build_mul lhs rhs "binopout" bld
   | Binop ('/', a, b) ->
-    let lhs = build_binop a in
-    let rhs = build_binop b in
+    let lhs = build_binop f a in
+    let rhs = build_binop f b in
     build_sdiv lhs rhs "binopout" bld
   | Binop _ -> failwith "[TODO:binop] i need to impl it..."
-  | _ -> failwith "[ERROR] incorrect value in binary operation"
+  | v -> f v
 ;;
 
 let build_logicop context f = function
@@ -187,7 +185,8 @@ let build_variable context f name e =
 let proc_block context f l = List.map (f context) l |> List.rev |> List.hd
 
 let rec walk (context : Symbols.t) = function
-  | (Int _ | Binop _) as v -> build_binop v
+  | Int v -> const_int i32_t v
+  | Binop _ as v -> build_binop (walk context) v
   | (Bool _ | Logicop _) as v -> build_logicop context walk v
   | String v -> build_global_stringptr (Scanf.unescaped v) "glbstr" bld
   | Symbol v -> get_var v

@@ -1,10 +1,10 @@
 ; Example of type system
 
 ; (defparameter username "Sebastian")
-(defparameter default 0)
+(defparameter default 10)
 
 (: greet (Integer -> Integer)) 
-(defun greet (a) (+ a (greet (- a 1))))
+(defun greet (a) (if (= a default) (+ 59 a) (greet (+ a 1))))
 
 ; (: add (Integer -> Integer -> Integer)) 
 ; (defun add (a b) (- (+ a b) 100))

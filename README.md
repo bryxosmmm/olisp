@@ -1,14 +1,14 @@
-# O'lisp 
-
-O'lisp is compiller for lisp language, written in ocaml.
+# Olisp 
+Olisp is compiller for lisp language, written in ocaml.
 
 ## Can i do...
 1) Libc functions, yes
 2) Binop, yes 
 3) Logicop/if/else, yes
 4) functions, yes
-5) variables, not yet
-6) macros, not yet
+5) variables, yes
+6) structs, yes
+7) macros, not yet
 
 ## Examples
 ```lisp
@@ -30,7 +30,4 @@ O'lisp is compiller for lisp language, written in ocaml.
 (greet "Sebastian" (add 2 2))
 ```
 ## TODO
-- [x] Functions 
-- [ ] Variables (Working like args of functions, but not like variables)
-- [ ] Macros
-- [ ] My context for evaluating
+- [ ] debug all this ...

@@ -6,6 +6,6 @@ let parse buf = buf |> main lex
 let chan () = open_out "out/out.ll"
 
 let () =
-  let buf = lexbuf "example.lisp" in
+  let buf = lexbuf "example.scm" in
   parse buf |> Dragon.program (chan ())
 ;;

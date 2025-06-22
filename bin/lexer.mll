@@ -5,11 +5,11 @@
 let skip = [' ' '\t' '\n'] | ';'[^'\n']*
 
 let digits = (['1'-'9'] ['0'-'9']* | '0')
-let symbol = ['a'-'z' 'A'-'Z']+
+let symbol = ['a'-'z' 'A'-'Z' '0'-'9' '.' '-']+
 let string = '"' [^'"']+ '"'
 let binop = ['+' '-' '*' '/']
 let logicop = "and" | "or" | "=" | "<" | ">" | "<=" | ">="
-let type = "Integer" | "String" | "Bool"
+(*let type = "I32" | "I8" | "String" | "Bool" | "Void" | "..." *)
 rule lex = parse 
 | "->" { ARROW }
 | "if" { IF }
@@ -18,7 +18,8 @@ rule lex = parse
 | "defparameter" { DEFPARAM }
 | "true" { TRUE }
 | "false" { FALSE }
-| type as t { TYPE t }
+| "extern" { EXTERN }
+| "struct" { STRUCTDEF }
 | binop as b { BINOP b }
 | logicop as l { LOGICOP l }
 | ':' { SEMICOLON }

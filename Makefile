@@ -1,5 +1,8 @@
-build:
-	dune exec parser && clang ./out/out.ll -o ./out/bin/b
+exec:
+	dune exec parser --ignore-lock-dir && clang ./out/out.ll -lraylib -o ./out/bin/b
+
+execone:
+	dune exec parser --ignore-lock-dir && cat ./out/out.ll
 
 compile:
-	clang ./out/out.ll -o ./out/bin/b
+	clang ./out/out.ll -lraylib -o ./out/bin/b -g

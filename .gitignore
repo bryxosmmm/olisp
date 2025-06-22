@@ -1,2 +1,5 @@
 _build
+.envrc
+dev-tools.locks
+dune.lock
 out

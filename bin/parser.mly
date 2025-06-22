@@ -2,14 +2,13 @@
 open Ast
 %}
 %token EOF LPAREN RPAREN ARROW SEMICOLON
-%token <int> INT
+%token <int> INT 
 %token <string> STRING
 %token <string> SYMBOL
 %token <char> BINOP
 %token IF TRUE FALSE
 %token <string> LOGICOP
-%token DEFUN DEFPARAM LET
-%token <string> TYPE
+%token DEFUN DEFPARAM LET EXTERN STRUCTDEF 
 %start <expr list> main
 
 %%
@@ -19,7 +18,7 @@ main:
 | error { failwith "Syntax error" }
 
 expr:
-| INT { Int $1 }
+| intexpr { $1 }
 | STRING { String $1 }
 | SYMBOL { Symbol $1 }
 | binexpr { $1 }
@@ -28,13 +27,19 @@ expr:
 | boolean { $1 }
 | defun { $1 }
 | typedef { $1 }
+| externdef { $1 }
 | defparam { $1 }
 | defvar { $1 }
+| structdef { $1 }
+
+intexpr:
+| INT { Int ($1, "I32") }
+| LPAREN INT SYMBOL RPAREN { Int ($2, $3) }
 
 
 binexpr:
-| LPAREN INT RPAREN { Int $2 }
-| LPAREN RPAREN { Int 0 }
+| LPAREN INT RPAREN { Int ($2, "I32") }
+| LPAREN RPAREN { Int (0, "I32") }
 | LPAREN BINOP expr expr RPAREN { Binop($2, $3, $4) }
 
 callexpr:
@@ -51,6 +56,7 @@ boolean:
 
 ifexpr:
 | LPAREN IF expr expr expr RPAREN { If($3, $4, $5) }
+| LPAREN IF expr expr_list expr_list RPAREN { If($3, Block $4, Block $5) }
 
 defun:
 | LPAREN DEFUN SYMBOL funargs expr RPAREN { Defun($3, $4, $5) }
@@ -65,10 +71,14 @@ funargs:
 typedef:
 | LPAREN SEMICOLON SYMBOL LPAREN types RPAREN RPAREN { Typedef($3, $5) }
 
+externdef:
+| LPAREN EXTERN SEMICOLON SYMBOL LPAREN types RPAREN RPAREN { Externdef("", $4, $6) }
+| LPAREN EXTERN SYMBOL SEMICOLON SYMBOL LPAREN types RPAREN RPAREN { Externdef($3, $5, $7) }
+
 types:
 | { [] }
-| TYPE { [$1] }
-| TYPE ARROW types { $1 :: $3 }
+| SYMBOL { [$1] }
+| SYMBOL ARROW types { $1 :: $3 }
 
 defparam:
 | LPAREN DEFPARAM SYMBOL expr RPAREN { Defparam($3, $4) }
@@ -79,3 +89,13 @@ defvar:
 expr_list:
 | expr { [$1] }
 | expr expr_list { $1 :: $2 }
+
+field:
+| LPAREN SYMBOL SYMBOL RPAREN { ($2, $3) }
+
+fields:
+| { [] }
+| field fields { $1 :: $2 }
+
+structdef:
+| LPAREN STRUCTDEF SYMBOL fields RPAREN { Struct($3, $4) }

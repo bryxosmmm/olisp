@@ -17,7 +17,7 @@ type binop =
 
 type expr =
   | Bool of bool
-  | Int of int
+  | Int of int * string
   | String of string
   | Symbol of string
   | If of expr * expr * expr
@@ -26,6 +26,8 @@ type expr =
   | Call of string * expr list
   | Defun of string * string list * expr
   | Typedef of string * string list
+  | Externdef of string * string * string list
   | Defparam of string * expr
   | Block of expr list
   | Defvar of string * expr
+  | Struct of string * (string * string) list

@@ -4,11 +4,11 @@ open Ast
 %token EOF LPAREN RPAREN ARROW SEMICOLON
 %token <int> INT 
 %token <string> STRING
-%token <string> SYMBOL
+%token <string> SYMBOL MSYMBOL
 %token <char> BINOP
 %token IF TRUE FALSE
 %token <string> LOGICOP
-%token DEFUN DEFPARAM LET EXTERN STRUCTDEF 
+%token DEFUN DEFPARAM LET EXTERN STRUCTDEF MACRODEF
 %start <expr list> main
 
 %%
@@ -31,6 +31,7 @@ expr:
 | defparam { $1 }
 | defvar { $1 }
 | structdef { $1 }
+| macrodef { $1 }
 
 intexpr:
 | INT { Int ($1, "I32") }
@@ -99,3 +100,6 @@ fields:
 
 structdef:
 | LPAREN STRUCTDEF SYMBOL fields RPAREN { Struct($3, $4) }
+
+macrodef:
+| LPAREN MACRODEF SYMBOL funargs expr RPAREN { Macrodef($3, $4, $5) }

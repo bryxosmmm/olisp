@@ -362,9 +362,10 @@ let rec walk (context : Symbols.t) = function
     display_struct_fn name fields ty;
     build_getters name fields ty;
     const_int i32_t 0
+  | Macrodef (name, args, expr) ->
+    insert name (Macro (args, expr)) symbols;
+    const_int i32_t 0
 ;;
-
-(* | _ -> failwith "[ERROR] maybe i need to impl it..." *)
 
 let program f o =
   let context = Symbols.return main_ty main_fn main_entry in

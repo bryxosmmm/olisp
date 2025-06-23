@@ -9,6 +9,7 @@ type record =
   | Variable of llvalue
   | Typeof of lltype list
   | Type of lltype
+  | Macro of string list * Ast.expr
 
 type t =
   { fn : llvalue

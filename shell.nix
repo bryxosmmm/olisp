@@ -14,9 +14,6 @@ pkgs.mkShell {
     ocamlPackages.menhirLib
     ocamlPackages.llvm
     opam
-    raylib
-    gdb
-    lldb
   ];
 }
 

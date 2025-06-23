@@ -31,3 +31,4 @@ type expr =
   | Block of expr list
   | Defvar of string * expr
   | Struct of string * (string * string) list
+  | Macrodef of string * string list * expr

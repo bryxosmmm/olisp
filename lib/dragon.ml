@@ -1,6 +1,7 @@
 open Llvm
 open Ast
 open Symbols
+module StringMap = Map.Make (String)
 
 let ctx = create_context ()
 let the_mod = create_module ctx "main_mod"
@@ -53,11 +54,18 @@ let get_fn s =
   | _ -> failwith "[ERROR:fn] incorrect symbol"
 ;;
 
+let get_macro s =
+  let sym = get s symbols in
+  match sym with
+  | Some (Macro (fields, tree)) -> fields, tree
+  | _ -> failwith "[ERROR:macro] incorrect symbol"
+;;
+
 let get_var s =
   let sym = get s symbols in
   match sym with
   | Some (Variable v) -> v
-  | _ -> failwith "[ERROR:var] incorrect symbol"
+  | _ -> failwith (Printf.sprintf "[ERROR:var] incorrect symbol %s" s)
 ;;
 
 let get_typedef s =
@@ -338,6 +346,31 @@ let build_int i ts =
   const_int t i
 ;;
 
+let replace_ast env name v =
+  match StringMap.find_opt name env with
+  | None -> v
+  | Some vv -> vv
+;;
+
+let rec walk_macro_ast context f env = function
+  | Symbol v as value -> replace_ast env v value
+  | If (a, b, c) ->
+    let cond = walk_macro_ast context f env a in
+    let lhs = walk_macro_ast context f env b in
+    let rhs = walk_macro_ast context f env c in
+    If (cond, lhs, rhs)
+  | other -> other
+;;
+
+let call_macro context f name exprs =
+  let fields, ast_block = get_macro name in
+  List.iter (Printf.printf "%s\n") fields;
+  let env =
+    List.fold_right2 (fun n e acc -> StringMap.add n e acc) fields exprs StringMap.empty
+  in
+  walk_macro_ast context f env ast_block |> f context
+;;
+
 let rec walk (context : Symbols.t) = function
   | Int (v, ts) -> build_int v ts
   | Binop _ as v -> build_binop (walk context) v
@@ -365,6 +398,7 @@ let rec walk (context : Symbols.t) = function
   | Macrodef (name, args, expr) ->
     insert name (Macro (args, expr)) symbols;
     const_int i32_t 0
+  | Macrouse (name, e) -> call_macro context walk name e
 ;;
 
 let program f o =

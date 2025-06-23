@@ -32,6 +32,7 @@ expr:
 | defvar { $1 }
 | structdef { $1 }
 | macrodef { $1 }
+| macrouse { $1 }
 
 intexpr:
 | INT { Int ($1, "I32") }
@@ -103,3 +104,6 @@ structdef:
 
 macrodef:
 | LPAREN MACRODEF SYMBOL funargs expr RPAREN { Macrodef($3, $4, $5) }
+
+macrouse:
+| LPAREN MSYMBOL variadic RPAREN { Macrouse($2, $3) }

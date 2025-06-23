@@ -28,7 +28,7 @@ rule lex = parse
 | ')' { RPAREN }
 | skip { lex lexbuf }
 | digits as n { INT (int_of_string n) }
-| msymbol as s { MSYMBOL s }
+| msymbol as s { MSYMBOL (String.sub s 0 (String.length s - 1)) }
 | symbol as f { SYMBOL f}
 | string as s { STRING (String.sub s 1 (String.length s - 2)) }
 | eof  { EOF }

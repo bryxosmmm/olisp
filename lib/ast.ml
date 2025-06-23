@@ -32,3 +32,4 @@ type expr =
   | Defvar of string * expr
   | Struct of string * (string * string) list
   | Macrodef of string * string list * expr
+  | Macrouse of string * expr list
